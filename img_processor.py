@@ -1,6 +1,5 @@
 import os
 import subprocess
-from pathlib import Path
 from psd_tools import PSDImage
 from PIL import Image
 
@@ -88,25 +87,3 @@ class ImageProcessor:
             print(result.stderr)
             return None
         return result
-
-
-def process_folder(folder_path, folder_result):
-    for root, _, files in os.walk(folder_path):
-        # Calculate the relative path to maintain the same folder structure
-        relative_path = Path(root).relative_to(folder_path)
-        target_folder = Path(folder_result) / relative_path
-
-        # Create the target folder if it doesn't exist
-        target_folder.mkdir(parents=True, exist_ok=True)
-
-        for file in files:
-
-            input_file = Path(root) / file
-            output_file = Path(target_folder) / (file.rsplit('.', 1)[0] + ".psd")
-
-            # Initialize the processor
-            processor = ImageProcessor(input_file=input_file, output_file=output_file)
-            processor.resize_image()
-
-
-process_folder(source_dir, target_dir)

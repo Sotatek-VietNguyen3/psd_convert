@@ -1,37 +1,44 @@
 import os
-from img_processor import process_folder
-from gdrive_processor import authenticate_and_download_zip, upload_folder
+from pathlib import Path
+
+from gdrive_processor import GDriveProcessor
+from img_processor import ImageProcessor
 
 base_dir = os.path.dirname(__file__)
 source_dir = os.path.join(base_dir, 'source')
 target_dir = os.path.join(base_dir, 'target')
-temp_dir = os.path.join(base_dir, 'temp')
-
-if not os.path.exists(target_dir):
-    os.makedirs(target_dir)
 
 
-# https://drive.google.com/file/d/1Oh2vhnnh2Rr3NDvEVTmLNaR4x_BApwOJ/view?usp=drive_link
-# https://drive.google.com/file/d/1wGl_KP1WmIWOSR1bpJAM7gd-KgMMS8Ur/view?usp=drive_link
-# https://drive.google.com/file/d/1q1G1UcHKRy745XT5Uppf2oi4AwVCdlEy/view?usp=drive_link
 def main():
     print('Downloading')
-    unzip_folder = authenticate_and_download_zip(source_dir, '1q1G1UcHKRy745XT5Uppf2oi4AwVCdlEy')
+    processor = GDriveProcessor(download_folder_id=download_folder_id, upload_folder_id=upload_folder_id)
+    processor.download_folder()
 
-    print('Uploading')
-    upload_folder_dir = os.path.join(target_dir, os.path.basename(unzip_folder))
-    if not os.path.exists(upload_folder_dir):
-        os.makedirs(upload_folder_dir)
+    for root, _, files in os.walk(source_dir):
+        # Calculate the relative path to maintain the same folder structure
+        relative_path = Path(root).relative_to(source_dir)
+        target_folder = Path(target_dir) / relative_path
 
-    # Process all files in the source directory
-    # process_folder(unzip_folder, upload_folder_dir)
-    process_folder(unzip_folder, upload_folder_dir)
+        # Create the target folder if it doesn't exist
+        target_folder.mkdir(parents=True, exist_ok=True)
 
-    # upload_folder(upload_folder_dir)
+        for file in files:
+
+            input_file = Path(root) / file
+            output_file = Path(target_folder) / (file.rsplit('.', 1)[0] + ".psd")
+
+            # Initialize the processor
+            processor = ImageProcessor(input_file=input_file, output_file=output_file)
+            processor.resize_image()
+
+    processor.upload_folder(target_dir)
 
 
 if __name__ == "__main__":
+    download_folder_id = input("Enter download folder id: ")
+    upload_folder_id = input("Enter upload folder id: ")
     main()
+
     import sys
 
     sys.exit()
