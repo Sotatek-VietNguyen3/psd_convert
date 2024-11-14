@@ -18,7 +18,7 @@ class ImageProcessor:
         'image/jpg',
     ]
 
-    def __init__(self, input_file, output_file, height=None, width=760):
+    def __init__(self, input_file, output_file,  width=760, height=None):
         self.input_file = input_file
         self.output_file = output_file
         self.height = height

@@ -28,7 +28,7 @@ def main():
             output_file = Path(target_folder) / (file.rsplit('.', 1)[0] + ".psd")
 
             # Initialize the processor
-            processor = ImageProcessor(input_file=input_file, output_file=output_file)
+            processor = ImageProcessor(input_file=input_file, output_file=output_file, width=width)
             processor.resize_image()
 
     processor.upload_folder(target_dir)
@@ -37,6 +37,7 @@ def main():
 if __name__ == "__main__":
     download_folder_id = input("Enter download folder id: ")
     upload_folder_id = input("Enter upload folder id: ")
+    width = int(input("Enter image width resize: "))
     main()
 
     import sys
